@@ -9,7 +9,14 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+
 public class JournalAdapter extends RecyclerView.Adapter<JournalAdapter.JournalViewHolder> {
+
+    private DatabaseReference mDatabase;
 
     private int mNumberItems;
     public JournalAdapter(int numberItems) {
@@ -30,6 +37,7 @@ public class JournalAdapter extends RecyclerView.Adapter<JournalAdapter.JournalV
         return viewHolder;
     }
 
+
     @Override
     public void onBindViewHolder(JournalViewHolder holder, int position) {
         holder.bind(position);
@@ -43,15 +51,18 @@ public class JournalAdapter extends RecyclerView.Adapter<JournalAdapter.JournalV
 
     class JournalViewHolder extends RecyclerView.ViewHolder {
 
-        TextView titleText;
+        public TextView titleText;
+        public TextView entryText;
 
         public JournalViewHolder(View itemView) {
             super(itemView);
 
             titleText = (TextView) itemView.findViewById(R.id.title);
+            entryText = (TextView) itemView.findViewById(R.id.entry);
         }
         void bind(int listIndex) {
             titleText.setText(String.valueOf(listIndex));
+            entryText.setText(String.valueOf(listIndex));
         }
     }
 }
