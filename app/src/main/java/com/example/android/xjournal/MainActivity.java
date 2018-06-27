@@ -18,7 +18,7 @@ import com.google.firebase.database.ValueEventListener;
 
 public class MainActivity extends AppCompatActivity {
 
-    private static final int LIST_ITEM = 1;
+    private static final int LIST_ITEM = 10;
     private JournalAdapter mAdapter;
     private RecyclerView mNumbersList;
     private DatabaseReference mDatabase;
