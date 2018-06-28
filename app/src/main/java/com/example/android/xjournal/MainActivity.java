@@ -1,89 +1,129 @@
 package com.example.android.xjournal;
 
 import android.content.Intent;
+import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-import android.support.v7.widget.LinearLayoutManager;
-import android.support.v7.widget.RecyclerView;
+import android.text.TextUtils;
 import android.view.View;
 import android.widget.Button;
-import android.widget.ImageButton;
-import android.widget.TextView;
+import android.widget.EditText;
+import android.widget.Toast;
 
-import com.google.firebase.database.DataSnapshot;
-import com.google.firebase.database.DatabaseError;
-import com.google.firebase.database.DatabaseReference;
-import com.google.firebase.database.FirebaseDatabase;
-import com.google.firebase.database.ValueEventListener;
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
+import com.google.firebase.auth.AuthResult;
+import com.google.firebase.auth.FirebaseAuth;
 
 public class MainActivity extends AppCompatActivity {
 
-    private static final int LIST_ITEM = 10;
-    private JournalAdapter mAdapter;
-    private RecyclerView mNumbersList;
-    private DatabaseReference mDatabase;
-    ImageButton mImageButton;
-    TextView mTitleText;
+    private EditText mEmailField;
+    private EditText mPasswordField;
+
+    private Button mLoginButton;
+    private Button mRegisterButton;
+
+    private FirebaseAuth mAuth;
+    private FirebaseAuth.AuthStateListener mAuthListener;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        mNumbersList = (RecyclerView) findViewById(R.id.rv_entries);
-        LinearLayoutManager layoutManager = new LinearLayoutManager(this);
-        mNumbersList.setLayoutManager(layoutManager);
-        mNumbersList.setHasFixedSize(true);
+        mAuth = FirebaseAuth.getInstance();
 
-        mAdapter = new JournalAdapter(LIST_ITEM);
-        mNumbersList.setAdapter(mAdapter);
+        mEmailField = (EditText) findViewById(R.id.email);
+        mPasswordField = (EditText) findViewById(R.id.password);
 
+        mLoginButton = (Button) findViewById(R.id.login_button);
+        mRegisterButton = (Button) findViewById(R.id.register_button);
 
-        mTitleText = (TextView) findViewById(R.id.title);
-
-
-/*
-        the following code is to get text back from the journal entry, or is it?
-
-        Intent intentThatGoesBackToThisActivity = getIntent();
-
-        if (intentThatGoesBackToThisActivity.hasExtra(Intent.EXTRA_TEXT)){
-            String textEntered = intentThatGoesBackToThisActivity.getStringExtra(Intent.EXTRA_TEXT);
-            mTitleText.setText(textEntered);
-
-             the following code is to get text back from the journal entry, or is it? Yess this too.
-
-        mDatabase = FirebaseDatabase.getInstance().getReference().child("Title");
-
-        mDatabase.addValueEventListener(new ValueEventListener() {
+        mAuthListener = new FirebaseAuth.AuthStateListener() {
             @Override
-            public void onDataChange(DataSnapshot dataSnapshot) {
-                String name = dataSnapshot.getValue().toString();
-                mTitleText.setText(name);
+            public void onAuthStateChanged(@NonNull FirebaseAuth firebaseAuth) {
+                if(firebaseAuth.getCurrentUser() != null){
 
+                    startActivity(new Intent(MainActivity.this, JournalEntry.class));
+                }
             }
+        };
 
-            @Override
-            public void onCancelled(DatabaseError databaseError) {
-
-            }
-        });
-
-
-        }
-        */
-
-        mImageButton = (ImageButton) findViewById(R.id.imageButton);
-        mImageButton.setOnClickListener(new View.OnClickListener() {
+        mLoginButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Intent addJournalEntry = new Intent(MainActivity.this, JournalEntry.class );
-                startActivity(addJournalEntry);
+
+                startSignIn();
 
             }
         });
 
+        mRegisterButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+
+                registerUser();
+
+            }
+        });
+
+    }
+
+    private void registerUser(){
+        String email = mEmailField.getText().toString().trim();
+        String password = mPasswordField.getText().toString().trim();
+
+        if(TextUtils.isEmpty(email) || TextUtils.isEmpty(password)){
+
+            Toast.makeText(MainActivity.this, "One or more fields are empty", Toast.LENGTH_LONG).show();
+            return;
+
+        }
+        mAuth.createUserWithEmailAndPassword(email, password)
+                .addOnCompleteListener(this, new OnCompleteListener<AuthResult>() {
+                    @Override
+                    public void onComplete(@NonNull Task<AuthResult> task) {
+                        if(task.isSuccessful()){
+                            Toast.makeText(MainActivity.this, "Registered", Toast.LENGTH_LONG).show();
+                            startActivity(new Intent(MainActivity.this, JournalEntry.class));
+                        } else{
+                            Toast.makeText(MainActivity.this, "not Registered", Toast.LENGTH_LONG).show();
+                        }
+                    }
+                });
+
+    }
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+        mAuth.addAuthStateListener(mAuthListener);
+    }
+
+    private void startSignIn(){
+
+        String email = mEmailField.getText().toString();
+        String password = mPasswordField.getText().toString();
+
+        if(TextUtils.isEmpty(email) || TextUtils.isEmpty(password)){
+
+            Toast.makeText(MainActivity.this, "Fields are empty", Toast.LENGTH_LONG).show();
+
+        } else{
+            mAuth.signInWithEmailAndPassword(email, password).addOnCompleteListener(new OnCompleteListener<AuthResult>() {
+                @Override
+                public void onComplete(@NonNull Task<AuthResult> task) {
+
+                    if(!task.isSuccessful()){
+                        Toast.makeText(MainActivity.this, "Sign in unseccessful", Toast.LENGTH_LONG).show();
+                        startActivity(new Intent(MainActivity.this, JournalEntry.class));
+                    }
+                }
+            });
+        }
 
 
     }
+
 }

@@ -19,9 +19,8 @@
             </intent-filter>
         </activity>
         <activity android:name=".JournalEntry" />
-        <activity android:name=".ListItem"/>
-        <activity android:name=".LogIn">
-        </activity>
+        <activity android:name=".ListItem" />
+        <activity android:name=".EnteredData"></activity>
     </application>
 
 </manifest>
