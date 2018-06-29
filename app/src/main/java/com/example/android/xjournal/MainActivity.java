@@ -44,8 +44,8 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onAuthStateChanged(@NonNull FirebaseAuth firebaseAuth) {
                 if(firebaseAuth.getCurrentUser() != null){
-
                     startActivity(new Intent(MainActivity.this, JournalEntry.class));
+                    Toast.makeText(MainActivity.this, "You're already signed in", Toast.LENGTH_LONG).show();
                 }
             }
         };
@@ -114,10 +114,11 @@ public class MainActivity extends AppCompatActivity {
             mAuth.signInWithEmailAndPassword(email, password).addOnCompleteListener(new OnCompleteListener<AuthResult>() {
                 @Override
                 public void onComplete(@NonNull Task<AuthResult> task) {
-
-                    if(!task.isSuccessful()){
-                        Toast.makeText(MainActivity.this, "Sign in unseccessful", Toast.LENGTH_LONG).show();
+                    if(task.isSuccessful()){
+                        Toast.makeText(MainActivity.this, "Success", Toast.LENGTH_LONG).show();
                         startActivity(new Intent(MainActivity.this, JournalEntry.class));
+                    } else{
+                        Toast.makeText(MainActivity.this, "Log in unsuccessful", Toast.LENGTH_LONG).show();
                     }
                 }
             });
