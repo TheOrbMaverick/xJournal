@@ -50,10 +50,10 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="password must be 7 characters or more"
-        android:textColor="#ffffff"
-        android:textSize="10sp"
+        android:textColor="#a39f9f"
+        android:textSize="12sp"
         android:layout_gravity="center_horizontal"
-        android:layout_marginBottom="10dp"/>
+        android:layout_marginBottom="20dp"/>
 
     <Button
         android:id="@+id/login_button"
